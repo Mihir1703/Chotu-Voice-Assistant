@@ -1,0 +1,8 @@
+pyttsx3~=2.90
+SpeechRecognition
+requests~=2.25.1
+wikipedia~=1.4.0
+googlesearch-python
+mysql-connector-python~=8.0.27
+spotipy~=2.19.0
+pyautogui~=0.9.53
