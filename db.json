@@ -1,0 +1,6 @@
+{
+  "host": "mihir.mysql.database.azure.com",
+  "user": "mihir@mihir",
+  "password": "mysql@azure17",
+  "database": "assignment"
+}
