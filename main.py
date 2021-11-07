@@ -96,14 +96,12 @@ def get_command():
     listeners = s.Recognizer()
     # activating microphone as source
     with s.Microphone() as source:
-        # wait for 0.5 second if no sound detected
-        listeners.pause_threshold = 0.5
         # listening to query made by user
         audio = listeners.listen(source)
         # if any error return None
         try:
             # get text from speech using google
-            source_data = listeners.recognize_google(audio, language="en-in")
+            source_data = listeners.recognize_google(audio)
             # to lowercase
             lower_query = str(source_data.lower())
             return lower_query
@@ -133,12 +131,10 @@ def search_wiki():
     search = get_not_empty_command()
     # searching query via wikipedia module
     try:
-        # searching for the right keywords
-        inputs = wikipedia.search(search, results=5)
         # if there is any error while processing use except block commands
         try:
             # getting data for keyword
-            result = wikipedia.summary(inputs, sentences=5)
+            result = wikipedia.summary(search, sentences=5)
         # if multiple results found show the first one
         except wikipedia.DisambiguationError as e:
             result = wikipedia.summary(e.options[0], sentences=5)
@@ -220,21 +216,26 @@ def open_app(query):
         path = "C:\\Users\\Administrator\\Desktop\\Yahoo Mail.lnk"
         os.startfile(path)
     elif 'game' in search:
-        speak("Opening Smash Karts, Hope you enjoy the game")
+        speak("Opening Smash Karts")
         path = "C:\\Users\\Administrator\\Desktop\\Smash Karts.lnk"
         os.startfile(path)
+    else:
+        speak("Application not found")
 
 
 # opens website as needed
 def open_web(query):
-    index = query.find('open website')
+    index = query.find('open')
     # getting search keyword
-    index = index + len('open website')
+    index = index + len('open')
     # taking input from user
     to_search = query[index::]
     # search function from google search module provides us number of url and we are going to open the 1st one and
     # open function opens url in default browser
-    webbrowser.open(search(to_search)[0])
+    try:
+        webbrowser.open(search(to_search)[0])
+    except:
+        speak("Please provide me a correct command, Sir")
 
 
 # this helps in adding assignments record to MySQL database
@@ -248,6 +249,10 @@ def assign_rec():
     dt = datetime.date.today().strftime('''%Y-%m-%d''')
     # if database connection fails or interval is a string then error will be handled
     try:
+        #  to deal with negative values
+        if int(interval) < 0:
+            speak("Negative values not allowed!!")
+            return
         # executing following query on SQl
         mycursor.execute(f'insert into {table_name} values("{sub}",DATE_ADD("{dt}", INTERVAL {int(interval)} DAY))')
         # commit the changes to the MySQL
@@ -270,7 +275,7 @@ def show_assign():
         arr.append(i[0])
     # if no assignments pending say this
     if len(arr) == 0:
-        speak("Hurray, you have done all assignments")
+        speak("You have done all assignments now it's time to enjoy")
         return
     # converting list into a dictionary so that there should be no duplicate entry and duplicate entry would be
     # incremented in count
@@ -313,7 +318,7 @@ if __name__ == "__main__":
         elif 'pending assignment' in query:
             show_assign()
         # open websites
-        elif 'open website' in query:
+        elif 'open' in query:
             open_web(query)
         # opening application
         elif 'application' in query:
