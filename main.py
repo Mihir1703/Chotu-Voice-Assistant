@@ -44,13 +44,13 @@ def wish_me():
     hour = int(datetime.datetime.now().hour)
     # if time between 0 to 12 say Good Morning
     if 0 <= hour < 12:
-        speak("Good Morning Sir")
+        speak("Good Morning Bro")
     # if time between 12 to 18 say Good Afternoon
     elif 12 <= hour <= 18:
-        speak("Good Afternoon Sir")
+        speak("Good Afternoon Bro")
     # else say Good Evening
     else:
-        speak("Good Evening Sir")
+        speak("Good Evening Bro")
     speak("Tell me what i can do for you")
 
 
@@ -62,7 +62,7 @@ def end_wish():
         speak("Good Night!! Hope we meet soon")
     # else say this
     else:
-        speak("Have a nice day, sir")
+        speak("Have a nice day, bro")
 
 
 # Get temperature
@@ -153,7 +153,7 @@ def play_music(query):
     # choice of user music
     choice = query.find('play music') + len('play music')
     #  getting song name
-    song = query[choice::]
+    song = query[choice::]  # (choice :: ) stores string from choice up to end
     # by chance if spotify api gives error we would prefer saying error occur besides exiting unusually
     try:
         # this function enables us to play sound
@@ -235,7 +235,7 @@ def open_web(query):
     try:
         webbrowser.open(search(to_search)[0])
     except:
-        speak("Please provide me a correct command, Sir")
+        speak("Please provide me a correct command, Bro")
 
 
 # this helps in adding assignments record to MySQL database
@@ -296,18 +296,20 @@ if __name__ == "__main__":
     # if user said exit we will exit
     while when_to_close:
         query = get_not_empty_command()
+        if 'chhotu' not in query:
+            continue
         # searching wikipedia
         if 'wikipedia' in query:
             search_wiki()
         # used this just for fun
         elif 'how are you' in query:
-            speak("I am fine Sir, hope same for you")
+            speak("I am fine Bro, hope same for you")
         # to know temperature
         elif "today's temperature" in query:
             get_temperature()
         # thank you reply
         elif 'thank you' in query:
-            speak("Pleasure to help you sir")
+            speak("Pleasure to help you bro")
         # for playing sound
         elif 'play music' in query:
             play_music(query)
