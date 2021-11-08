@@ -21,12 +21,11 @@ speak_engine.setProperty('voice', voices[1].id)
 
 credentials = json.load(open('db.json'))
 #  login credentials for MySQL database(this connects to database)
-database = mysql.connector.connect(host=credentials['host'], user=credentials['user'], password=credentials['password'],
-                                   database=credentials['database'])
+database = mysql.connector.connect(host=credentials['host'], user=credentials['user'], password=credentials['password'],database=credentials['database'])
 #  name of table where data is stored
 table_name = credentials['table']
 
-#  this serves as a middleware to facilitate query execution on MySQL from the current process
+# middleware function for handling all the queries in sql database
 mycursor = database.cursor()
 
 
@@ -59,10 +58,11 @@ def end_wish():
     hour = int(datetime.datetime.now().hour)
     # if night time say Good Night
     if 18 < hour < 24:
-        speak("Good Night!! Hope we meet soon")
+        speak("Good Night!!")
     # else say this
     else:
         speak("Have a nice day, bro")
+    speak("Thank you for using me, see you soon")
 
 
 # Get temperature
@@ -90,7 +90,7 @@ def get_temperature():
     speak(f'current temperature in {search} is {temp} degree Celsius')
 
 
-# Take command in form of voices and return back a string
+# Take command in form of voices and return back a string 
 def get_command():
     # initialising speech recogniser
     listeners = s.Recognizer()
@@ -104,6 +104,7 @@ def get_command():
             source_data = listeners.recognize_google(audio)
             # to lowercase
             lower_query = str(source_data.lower())
+            # return query
             return lower_query
         except Exception as e:
             # if exception print it
@@ -112,21 +113,21 @@ def get_command():
             return None
 
 
-# getting a valid command
+# getting a non empty command from user
 def get_not_empty_command():
     message = get_command()
     # while message is null retake input
-    while message is None:
+    while message is None or message == '':
         message = get_command()
     # if message becomes not null return
     print(message)
     return message
 
 
-# Using wikipedia to search queries
+# wikipedia search function using wikipedia module and speak first result 
 def search_wiki():
     global result
-    speak("What you want to search ?")
+    speak("What would you like to search")
     # getting query to search
     search = get_not_empty_command()
     # searching query via wikipedia module
@@ -140,15 +141,16 @@ def search_wiki():
             result = wikipedia.summary(e.options[0], sentences=5)
         # providing information to user
         speak(f"According to wikipedia ,{result}")
+        # wait for some time 
         time.sleep(0.5)
         speak(f"that's all about it.")
-    # if error occurs not to exit program
     except Exception as e:
         print(e)
+        # if error occurs not to exit program and say error occur to user
         speak("Sorry, we got some error from the server")
 
 
-# playing music spotify
+# playing music from spotify using spotifyAPI module 
 def play_music(query):
     # choice of user music
     choice = query.find('play music') + len('play music')
@@ -161,23 +163,23 @@ def play_music(query):
         return
     except Exception as e:
         print(e)
-        # if exception raised say user an error occurred
-        speak("Sorry sir, Some error occurred")
+        # if error occurs not to exit program and say error occur to user
+        speak("Sorry, we got some error from the server")
 
 
-# open application available on device
+# opening application in windows using windows shell commands 
 def open_app(query):
-    # extracting application name
     index = query.find('application') + len('application')
+    # getting application name from query
     search = query[index::]
     if 'notepad' in search:  # if keyword exists in search run the command block
         speak('Opening Notepad')
-        path = ('C:\\Windows\\system32\\notepad')
+        path = 'C:\\Windows\\system32\\notepad'
         # this will open the command line internally and process the path to start application
         os.startfile(path)
     elif 'command prompt' in search:
         speak('Opening command prompt')
-        path = ('C:\\Windows\\system32\\cmd')
+        path = 'C:\\Windows\\system32\\cmd'
         os.startfile(path)
     elif 'calculator' in search:
         speak("Opening calculator")
@@ -220,21 +222,23 @@ def open_app(query):
         path = "C:\\Users\\Administrator\\Desktop\\Smash Karts.lnk"
         os.startfile(path)
     else:
-        speak("Application not found")
+        speak("Sorry sir, I couldn't find the application")
 
 
-# opens website as needed
+# search for a query in google and open first result in browser using webbrowser module
 def open_web(query):
+    # extracting query from user input and storing it in to_search variable
     index = query.find('open')
-    # getting search keyword
     index = index + len('open')
-    # taking input from user
+    # getting search keyword from query string
     to_search = query[index::]
     # search function from google search module provides us number of url and we are going to open the 1st one and
     # open function opens url in default browser
     try:
+        # if there is any error while processing use except block commands
         webbrowser.open(search(to_search)[0])
     except:
+        # if error occurs say user an error occurred
         speak("Please provide me a correct command, Bro")
 
 
@@ -262,6 +266,7 @@ def assign_rec():
         speak("Some error occurred, please try again")
 
 
+#  function to show assignments from database
 def show_assign():
     #  getting today's date in specified format
     dt = datetime.date.today().strftime('''%Y-%m-%d''')
@@ -288,7 +293,7 @@ def show_assign():
         time.sleep(0.5)
 
 
-# main function
+# if function is main run the following lines of code
 if __name__ == "__main__":
     # wishing the user
     wish_me()

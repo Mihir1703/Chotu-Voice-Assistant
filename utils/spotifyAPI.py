@@ -2,7 +2,7 @@ import time  # time module
 import webbrowser  # helps to open links in web browser
 import pyautogui  # gui automation like click, press, hotkeys(like ctrl+C)
 import spotipy  # spotify module to get music links
-from spotipy.oauth2 import SpotifyClientCredentials  # spotify credential identifier
+from spotipy.oauth2 import SpotifyClientCredentials # to get access token for spotify api to play music on web browser 
 
 # api key generated on Spotify developers portal
 api_key = "52108268a761458484e2f2392f60f239"
