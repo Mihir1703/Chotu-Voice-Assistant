@@ -24,5 +24,5 @@ def play_sound(song):
     pyautogui.click(x=375, y=700)
     # wait for song to start
     time.sleep(5)
-    # redirect back to working area
+    # redirect back to working arena
     pyautogui.hotkey('alt', 'tab')

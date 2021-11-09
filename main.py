@@ -12,13 +12,14 @@ from googlesearch import search  # google search module provides relevant url us
 import mysql.connector  # connector for MySQL database
 import time  # python time module
 
-# python text to speech with inbuilt windows voices using Microsoft Sapi v5
+# python text to speech with inbuilt windows voices using Microsoft Speech api v5 (sapi5)
 speak_engine = pyttsx3.init('sapi5')
 # getting all voices present in windows machine as voices
 voices = speak_engine.getProperty('voices')
 # setting voice to particular sound as desired
 speak_engine.setProperty('voice', voices[1].id)
 
+# loading credentials from db.json file 
 credentials = json.load(open('db.json'))
 #  login credentials for MySQL database(this connects to database)
 database = mysql.connector.connect(host=credentials['host'], user=credentials['user'], password=credentials['password'],database=credentials['database'])
@@ -96,6 +97,8 @@ def get_command():
     listeners = s.Recognizer()
     # activating microphone as source
     with s.Microphone() as source:
+        # adjusting noise level and sensitivity of microphone to recognize voice in noisy atmosphere
+        listeners.adjust_for_ambient_noise(source)
         # listening to query made by user
         audio = listeners.listen(source)
         # if any error return None
@@ -103,7 +106,7 @@ def get_command():
             # get text from speech using google
             source_data = listeners.recognize_google(audio)
             # to lowercase
-            lower_query = str(source_data.lower())
+            lower_query = str(source_data).lower()
             # return query
             return lower_query
         except Exception as e:
@@ -301,8 +304,12 @@ if __name__ == "__main__":
     # if user said exit we will exit
     while when_to_close:
         query = get_not_empty_command()
-        if 'chhotu' not in query:
+        if 'thank you' in query:
+            speak("Pleasure to help you bro")
             continue
+        if 'chhotu' not in query:
+            if 'chotu' not in query:
+                continue
         # searching wikipedia
         if 'wikipedia' in query:
             search_wiki()
@@ -312,9 +319,6 @@ if __name__ == "__main__":
         # to know temperature
         elif "today's temperature" in query:
             get_temperature()
-        # thank you reply
-        elif 'thank you' in query:
-            speak("Pleasure to help you bro")
         # for playing sound
         elif 'play music' in query:
             play_music(query)
@@ -324,12 +328,12 @@ if __name__ == "__main__":
         # to know pending assignments
         elif 'pending assignment' in query:
             show_assign()
-        # open websites
-        elif 'open' in query:
-            open_web(query)
         # opening application
         elif 'application' in query:
             open_app(query)
+        # open websites
+        elif 'open' in query:
+            open_web(query)
         # exit program
         elif 'exit' in query:
             when_to_close = False
